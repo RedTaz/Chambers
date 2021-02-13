@@ -11,16 +11,17 @@ using System.Text;
 using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Chambers.Api.Orchestrators;
 
 namespace Chambers.Api
 {
     public class DocumentService
     {
-        private readonly IDocumentRepository _documentRepository;
+        private readonly IDocumentOrchestrator _documentOrchestrator;
 
-        public DocumentService(IDocumentRepository documentRepository)
+        public DocumentService(IDocumentOrchestrator documentOrchestrator)
         {
-            _documentRepository = documentRepository;
+            _documentOrchestrator = documentOrchestrator;
         }
 
         [FunctionName("Upload")]
@@ -31,25 +32,7 @@ namespace Chambers.Api
             var form = await req.ReadFormAsync();
             Document document = BindToDocument(form);
 
-            return await Upload(document);
-        }
-
-        public async Task<IActionResult> Upload(Document document)
-        {
-            if (document == null)
-                return new BadRequestResult();
-
-            Document reponse = await _documentRepository.CreateAsync(document);
-
-            if (document.Content.Length > 5000000)
-                return new StatusCodeResult(413);
-
-            // naive check for valid PDF, not foolproof, could be improved with supporting pdf library
-            var ascii = Encoding.ASCII.GetString(document.Content);
-            if (!ascii.StartsWith("%PDF-"))
-                return new UnsupportedMediaTypeResult();
-
-            return new OkObjectResult(reponse);
+            return await _documentOrchestrator.UploadAsync(document);
         }
 
         /// <remarks>
@@ -88,29 +71,40 @@ namespace Chambers.Api
 
         [FunctionName("List")]
         public async Task<IActionResult> List(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req
+        )
         {
-            IEnumerable<DocumentListItem> results = (await _documentRepository.ListAllAsync())
-                .Select(doc => new DocumentListItem()
-                {
-                    Location = $"//root/{doc.Id}", // arbitrary location since document is stored as data
-                    Name = doc.Name,
-                    Size = doc.Content.Length
-                });
-
-            return new OkObjectResult(results);
+            return await _documentOrchestrator.ListAsync();
         }
 
         [FunctionName("Order")]
         public async Task<IActionResult> Order(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] DocumentOrderRequest orderRequests)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestMessage req
+        )
         {
-            foreach (DocumentOrderRequestItem orderRequest in orderRequests)
-            {
-                await _documentRepository.UpdateAsync(orderRequest.DocumentId, orderRequest.Order);
-            }
+            string content = await req.Content.ReadAsStringAsync();
+            IEnumerable<DocumentOrderRequest> orderRequests 
+                = JsonConvert.DeserializeObject<IEnumerable<DocumentOrderRequest>>(content);
 
-            return new OkResult();
+            return await _documentOrchestrator.OrderAsync(orderRequests);
+        }
+
+        [FunctionName("Get")]
+        public async Task<IActionResult> Get(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Get/{reference}")] HttpRequest req,
+            string reference
+        )
+        {
+            return await _documentOrchestrator.GetAsync(reference);
+        }
+
+        [FunctionName("Delete")]
+        public async Task<IActionResult> Delete(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Delete/{reference}")] HttpRequest req,
+            string reference
+        )
+        {
+            return await _documentOrchestrator.DeleteAsync(reference);
         }
     }
 }

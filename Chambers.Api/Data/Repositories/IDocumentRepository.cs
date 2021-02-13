@@ -10,6 +10,8 @@ namespace Chambers.Api.Data.Repositories
     {
         Task<Document> CreateAsync(Document document);
 
+        Task<Document> GetAsync(Guid guid);
+
         Task DeleteAsync(Guid guid);
 
         Task UpdateAsync(Guid guid, int order);

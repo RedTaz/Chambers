@@ -2,6 +2,7 @@
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace Chambers.Api.Data.Repositories
 
             document.Id = Guid.NewGuid();
 
-            await _cosmosContainer.CreateItemAsync(document);
+            await _cosmosContainer.CreateItemAsync(document, new PartitionKey(document.Id.ToString()));
 
             return document;
         }
@@ -49,14 +50,31 @@ namespace Chambers.Api.Data.Repositories
             return results;
         }
 
-        public Task DeleteAsync(Guid guid)
+        public async Task<Document> GetAsync(Guid guid)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _cosmosContainer.ReadItemAsync<Document>(guid.ToString(), new PartitionKey(guid.ToString()));
+            }
+            catch (Exception)
+            {
+                // todo disambiguate cosmos 404 exception from general network exceptions
+                return null;
+            }
         }
 
-        public Task UpdateAsync(Guid guid, int order)
+        public async Task DeleteAsync(Guid guid)
         {
-            _cosmosContainer.ReadItemAsync(guid.ToString(), new PartitionKey(guid.ToString()));
+            await _cosmosContainer.DeleteItemAsync<Document>(guid.ToString(), new PartitionKey(guid.ToString()));
+        }
+
+        public async Task UpdateAsync(Guid guid, int order)
+        {
+            Document document = await GetAsync(guid);
+
+            document.Order = order;
+
+            await _cosmosContainer.UpsertItemAsync(document);
         }
     }
 }

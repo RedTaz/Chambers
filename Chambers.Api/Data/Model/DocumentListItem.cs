@@ -10,6 +10,8 @@ namespace Chambers.Api.Data.Model
 
         public string Location { get; set; }
 
+        public int Order { get; set; }
+
         public int Size { get; set; }
     }
 }
