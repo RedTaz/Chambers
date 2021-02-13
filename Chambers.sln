@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chambers.Api", "Chambers.Api\Chambers.Api.csproj", "{AF21D8E3-10EB-4241-8E85-04DF5544444D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chambers.Api.Tests", "Chambers.Api.Tests\Chambers.Api.Tests.csproj", "{1AB3DD91-82C1-4E21-884F-8E55B49F0461}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF21D8E3-10EB-4241-8E85-04DF5544444D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF21D8E3-10EB-4241-8E85-04DF5544444D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF21D8E3-10EB-4241-8E85-04DF5544444D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF21D8E3-10EB-4241-8E85-04DF5544444D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB3DD91-82C1-4E21-884F-8E55B49F0461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AB3DD91-82C1-4E21-884F-8E55B49F0461}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AB3DD91-82C1-4E21-884F-8E55B49F0461}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AB3DD91-82C1-4E21-884F-8E55B49F0461}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {55331007-47C3-401F-9CC9-2DB214BABBD2}
+	EndGlobalSection
+EndGlobal
